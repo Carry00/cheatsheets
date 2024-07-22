@@ -1,43 +1,29 @@
----
-tags: [ networking ]
----
-# To show hit for rules with auto refresh:
-watch --interval 0 'iptables -nvL | grep -v "0     0"'
+# 允许 IP 192.168.1.100
+iptables -A INPUT -s 192.168.1.100 -j ACCEPT -m comment --comment "Allow IP 192.168.1.100"
 
-# To show hit for rule with auto refresh and highlight any changes since the last refresh:
-watch -d -n 2 iptables -nvL
+# 允许 IP 192.168.1.100 访问端口 80
+iptables -A INPUT -s 192.168.1.100 -p tcp --dport 80 -j ACCEPT -m comment --comment "Allow IP 192.168.1.100 on port 80"
 
-# To block port 902 and hide this port from nmap:
-iptables -A INPUT -i eth0 -p tcp --dport 902 -j REJECT --reject-with icmp-port-unreachable
+# 允许 IP 192.168.1.100 访问端口 80 和 443
+iptables -A INPUT -s 192.168.1.100 -p tcp -m multiport --dports 80,443 -j ACCEPT -m comment --comment "Allow IP 192.168.1.100 on ports 80,443"
 
-# Note, --reject-with accept:
-#	icmp-net-unreachable
-#	icmp-host-unreachable
-#	icmp-port-unreachable <- Hide a port to nmap
-#	icmp-proto-unreachable
-#	icmp-net-prohibited
-#	icmp-host-prohibited or
-#	icmp-admin-prohibited
-#	tcp-reset
+# 允许 IP 范围 192.168.1.100 到 192.168.1.200
+iptables -A INPUT -m iprange --src-range 192.168.1.100-192.168.1.200 -j ACCEPT -m comment --comment "Allow IP range 192.168.1.100 to 192.168.1.200"
 
-# To add a comment to a rule:
-iptables ... -m comment --comment "This rule is here for this reason"
+# 允许网段 192.168.1.0/24 访问端口 22
+iptables -A INPUT -s 192.168.1.0/24 -p tcp --dport 22 -j ACCEPT -m comment --comment "Allow subnet 192.168.1.0/24 on port 22"
 
+# 允许 IP 192.168.1.100 使用 UDP 协议
+iptables -A INPUT -s 192.168.1.100 -p udp -j ACCEPT -m comment --comment "Allow IP 192.168.1.100 with UDP"
 
-# To remove or insert a rule:
-# 1) Show all rules
-iptables -L INPUT --line-numbers
-# OR iptables -nL --line-numbers
+# 允许网段 192.168.1.0/24 访问端口 80 和 443
+iptables -A INPUT -s 192.168.1.0/24 -p tcp -m multiport --dports 80,443 -j ACCEPT -m comment --comment "Allow subnet 192.168.1.0/24 on ports 80,443"
 
-# Chain INPUT (policy ACCEPT)
-#     num  target prot opt source destination
-#     1    ACCEPT     udp  --  anywhere  anywhere             udp dpt:domain
-#     2    ACCEPT     tcp  --  anywhere  anywhere             tcp dpt:domain
-#     3    ACCEPT     udp  --  anywhere  anywhere             udp dpt:bootps
-#     4    ACCEPT     tcp  --  anywhere  anywhere             tcp dpt:bootps
+# 允许 IP 192.168.1.100 每分钟访问端口 80 最多 5 次
+iptables -A INPUT -s 192.168.1.100 -p tcp --dport 80 -m limit --limit 5/min --limit-burst 10 -j ACCEPT -m comment --comment "Allow IP 192.168.1.100 on port 80 with rate limiting"
 
-# 2.a) REMOVE (-D) a rule. (here an INPUT rule)
-iptables -D INPUT 2
+# 将 IP 192.168.1.100 标记为 1
+iptables -A INPUT -s 192.168.1.100 -j MARK --set-mark 1 -m comment --comment "Mark IP 192.168.1.100 with mark 1"
 
-# 2.b) OR INSERT a rule.
-iptables -I INPUT {LINE_NUMBER} -i eth1 -p tcp --dport 21 -s 123.123.123.123 -j ACCEPT -m comment --comment "This rule is here for this reason"
+# 允许 IP 192.168.1.100 建立新连接和已建立的连接
+iptables -A INPUT -s 192.168.1.100 -m state --state NEW,ESTABLISHED -j ACCEPT -m comment --comment "Allow new and established connections from IP 192.168.1.100"
