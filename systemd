@@ -16,3 +16,21 @@ systemctl <start | stop> foo.service
 # To unit file locations:
 /etc/systemd/system
 /usr/lib/systemd/system
+
+[Unit]
+Description=My Custom Service
+After=network.target
+
+[Service]
+Type=simple
+User=myuser
+Group=mygroup
+WorkingDirectory=/path/to/working/directory
+ExecStart=/path/to/executable --option1 value1 --option2 value2
+Restart=on-failure
+RestartSec=5
+Environment="ENV_VAR1=value1" "ENV_VAR2=value2"
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
