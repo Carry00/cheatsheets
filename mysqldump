@@ -24,3 +24,7 @@ mysqldump --no-data -u<username> -p <database> > dump_file
 
 # To export the database data only:
 mysqldump --no-create-info -u<username> -p <database> > dump_file
+
+mysqldump -udba_root -p -hlocalhost -P6633 -S /data/db/mysql6633/mysql6633.sock \
+--skip-tz-utc --extended-insert=false --complete-insert  --set-gtid-purged=OFF \
+-n -t  mybase mytable --where "status <> 1 and bad_status <> 1"  > aaaa.sql

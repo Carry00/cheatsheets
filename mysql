@@ -38,3 +38,8 @@ SHOW PROCEDURE STATUS;
 
 # To check stored function:
 SHOW FUNCTION STATUS;
+
+# mysql export csv
+mysql -u root -p -e "select * from wordpress.wp_users" |sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g'  > /tmp/wp_users.csv
+sed -i '1s/^/\xEF\xBB\xBF/' /tmp/wp_users.csv
+
