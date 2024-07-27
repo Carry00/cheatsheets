@@ -102,3 +102,6 @@ docker cp <container-id>:<path/to/file> <host/copy/path>
 
 # To copy a file from host mechine to the running container:
 docker cp <host/copy/path> <container-id>:<path/to/file>
+
+# Launch the container and mount the host Docker socket
+docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock docker:latest sh
