@@ -1,0 +1,26 @@
+# Create a Topic
+/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server 10.10.10.10:9092 --replication-factor 3 --partitions 10 --create --topic test
+
+# List Topics
+/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server 10.10.10.10:9092 --list | grep MyTopic
+
+# Delete a Topic
+/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server 10.10.10.10:9092 --delete --topic test
+
+# Consume Messages from a Topic
+/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.10.10.10:9092 --topic test --from-beginning --max-messages 1
+
+# Produce Messages to a Topic
+/usr/local/kafka/bin/kafka-console-producer.sh --bootstrap-server 10.10.10.10:9092 --topic test
+
+# Alter Topic Configuration
+/usr/local/kafka/bin/kafka-configs.sh --bootstrap-server 10.10.10.10:9092 --entity-type topics --entity-name test --alter --add-config retention.ms=259200000
+
+# Describe a Topic
+/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server 172.31.28.25:9092 --describe --topic
+
+# Reassign Partitions - Execute
+/usr/local/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server 10.140.15.221:9092 --reassignment-json-file increase-replication-factor.json --execute
+
+# Reassign Partitions - Verify
+/usr/local/kafka/bin/kafka-reassign-partitions.sh --bootstrap-server 10.140.15.221:9092 --reassignment-json-file increase-replication-factor.json --verify
