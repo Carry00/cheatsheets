@@ -13,7 +13,7 @@ sed -i -r 's/^\s+//g' <file>
 # To remove empty lines and print results to stdout:
 sed '/^$/d' <file>
 
-# To replace newlines in multiple lines:
+# To join multiple lines into one by replacing newlines:多行内容合并成一行
 sed ':a;N;$!ba;s/\n//g' <file>
 
 # To insert a line before a matching pattern:

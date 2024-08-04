@@ -1,5 +1,111 @@
-# Reload firewall
+# Firewalld-cmd 常见命令
+
+## 基本命令
+
+# 查看 firewalld 的状态
+firewall-cmd --state
+
+# 启动 firewalld
+systemctl start firewalld
+
+# 停止 firewalld
+systemctl stop firewalld
+
+# 重启 firewalld
+systemctl restart firewalld
+
+# 开机时启用 firewalld
+systemctl enable firewalld
+
+# 禁用 firewalld 开机启动
+systemctl disable firewalld
+
+# 查看 firewalld 状态和运行信息
+systemctl status firewalld
+
+## 区域和接口管理
+
+# 查看所有区域
+firewall-cmd --get-zones
+
+# 查看活动区域
+firewall-cmd --get-active-zones
+
+# 查看某个区域中的接口
+firewall-cmd --zone=<zone> --list-interfaces
+
+# 将接口添加到区域
+firewall-cmd --zone=<zone> --add-interface=<interface> --permanent
+
+# 从区域中移除接口
+firewall-cmd --zone=<zone> --remove-interface=<interface> --permanent
+
+## 服务和端口管理
+
+# 查看某个区域允许的服务
+firewall-cmd --zone=<zone> --list-services
+
+# 在某个区域中添加服务
+firewall-cmd --zone=<zone> --add-service=<service> --permanent
+
+# 从某个区域中移除服务
+firewall-cmd --zone=<zone> --remove-service=<service> --permanent
+
+# 查看某个区域允许的端口
+firewall-cmd --zone=<zone> --list-ports
+
+# 在某个区域中添加端口
+firewall-cmd --zone=<zone> --add-port=<port>/<protocol> --permanent
+
+# 从某个区域中移除端口
+firewall-cmd --zone=<zone> --remove-port=<port>/<protocol> --permanent
+
+## 重新加载和配置
+
+# 重新加载 firewalld 配置
 firewall-cmd --reload
 
-# List rules
+# 立即生效的临时添加服务（不加 --permanent 选项）
+firewall-cmd --zone=<zone> --add-service=<service>
+
+# 立即生效的临时添加端口（不加 --permanent 选项）
+firewall-cmd --zone=<zone> --add-port=<port>/<protocol>
+
+# 查看所有配置（包括临时和永久）
 firewall-cmd --list-all
+
+## 富规则管理
+
+# 添加富规则
+firewall-cmd --zone=<zone> --add-rich-rule='<rule>' --permanent
+
+# 删除富规则
+firewall-cmd --zone=<zone> --remove-rich-rule='<rule>' --permanent
+
+# 列出某个区域中的所有富规则
+firewall-cmd --zone=<zone> --list-rich-rules
+
+## 示例
+
+# 添加 HTTP 服务到公共区域并重新加载配置
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --reload
+
+# 添加 TCP 8080 端口到公共区域并重新加载配置
+firewall-cmd --zone=public --add-port=8080/tcp --permanent
+firewall-cmd --reload
+
+# 添加富规则允许特定 IP 访问 SSH 服务
+firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.1.100" service name="ssh" accept' --permanent
+firewall-cmd --reload
+
+
+cat >/etc/firewalld/services/myservice.xml<<"EOF"
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>My Custom Service</short>
+  <description>This is a custom service for my application</description>
+  <port protocol="tcp" port="12345"/>
+  <port protocol="udp" port="12345"/>
+</service>
+EOF

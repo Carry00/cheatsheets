@@ -1,6 +1,52 @@
 # backup
-
-BACKUP DATABASE * TO 's3://tidbbackup?access-key=minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.107.16.33:9100&force-path-style=true' RATE_LIMIT = 120 MB/SECOND;
+BACKUP DATABASE * TO 's3://tidbbackup?access-key=minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.10.10.33:9100&force-path-style=true' RATE_LIMIT = 120 MB/SECOND;
 
 # Restore
-RESTORE DATABASE * FROM 's3://backup?access-key= minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.107.16.33:9100&force-path-style=true';
+RESTORE DATABASE * FROM 's3://backup?access-key=minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.10.10.33:9100&force-path-style=true';
+
+# Prepare Enviroment
+```
+useradd tidb
+mkdir /home/tidb/.ssh
+chmod 700 /home/tidb/.ssh
+cat >/home/tidb/.ssh/authorized_keys<<EOF
+ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EOF
+chmod 600 /home/tidb/.ssh/authorized_keys
+chown -R tidb. /home/tidb/
+vim /etc/ssh/sshd_config
+systemctl reload sshd
+echo "tidb ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+sudo -i
+echo "net.ipv4.tcp_syncookies = 0">> /etc/sysctl.conf
+echo "net.ipv4.tcp_tw_recycle = 0">> /etc/sysctl.conf
+echo "vm.swappiness = 0">> /etc/sysctl.conf
+
+cat >>/etc/security/limits.conf<<"EOF"
+# BEGIN ANSIBLE MANAGED BLOCK
+tidb        soft        nofile        1000000
+tidb        hard        nofile        1000000
+tidb        soft        stack         10240
+# END ANSIBLE MANAGED BLOCK
+EOF
+
+
+sudo -i
+swapoff -a
+sysctl -p
+echo "never" > /sys/kernel/mm/transparent_hugepage/enabled
+echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag
+echo 'noop' >  /sys/block/sdb/queue/scheduler
+
+cat >>/etc/rc.local<<"EOF"
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+  echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+  echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+EOF
+
+```
+
