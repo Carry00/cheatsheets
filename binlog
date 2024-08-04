@@ -1,0 +1,5 @@
+# my2sql
+wget https://github.com/liuhr/my2sql/raw/master/releases/centOS_release_7.x/my2sql
+
+# roll-back
+my2sql -user dba_admin -password xxxxx -host 127.0.0.1 -sql delete -port 3366 -mode file -local-binlog-file ./mysql_bin.000552 -work-type rollback -start-file mysql_bin.000552 -start-datetime "2024-05-30 19:25:00" -stop-datetime "2024-05-30 20:30:00" -output-dir ./tmpdir2

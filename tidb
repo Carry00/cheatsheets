@@ -1,0 +1,6 @@
+# backup
+
+BACKUP DATABASE * TO 's3://tidbbackup?access-key=minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.107.16.33:9100&force-path-style=true' RATE_LIMIT = 120 MB/SECOND;
+
+# Restore
+RESTORE DATABASE * FROM 's3://backup?access-key= minioadmin&secret-access-key=xxxxxxxxxx&endpoint=http://10.107.16.33:9100&force-path-style=true';

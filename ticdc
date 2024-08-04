@@ -1,0 +1,38 @@
+# update
+cdc cli changefeed  update --changefeed-id="tidb-kafka"   --config  /data/prod_cdc/tidb_kafka.conf
+
+# list
+watch -d '/data/tidb-deploy/cdc-8300/bin/cdc cli changefeed  list   --server=http://127.0.0.1:8300'
+
+# resume
+cdc cli changefeed   resume  --server=http://192.168.0.41:8300  --changefeed-id="tidb-kafka"
+
+# pause
+cdc cli changefeed   pause  --server=http://192.168.0.41:8300  --changefeed-id="tidb-kafka"
+
+# query
+cdc cli changefeed  query   --server=http://192.168.0.41:8300  --changefeed-id="tidb-kafka"
+
+#2MySQLCreate
+cdc cli changefeed create  --server=http://172.31.26.25:8300  --sink-uri="mysql://cdcuser:xxxxxxx@172.31.26.25:3306/" --changefeed-id="tidb-mysql-uat" --config  /home/tidb/uat_cdc/tidb_mysql.conf  --sort-engine="unified"
+
+#2kafkaCreate
+cdc cli changefeed create --server=http://172.31.25.3:8300 --sink-uri="kafka://172.31.25.9:9092/tidb-kafka?protocol=canal-json&partition-num=3&replication-factor=1" --change feed-id=tidb-kafka-1 --config  /home/tidb/fat_cdc/tidb_kafka_1.conf
+
+#2MySQLConfig
+
+#2KafkaConfig
+case-sensitive = true
+[filter]
+rules = ['mytestdb.mytable',
+         'mytestdb.mytable_detail',
+         'mytestdb.mytable_detail_info',
+         'mytestdb.tenant']
+[sink]
+dispatchers = [ 
+  {matcher = ['mytestdb.mytable'],topic = "{schema}_{table}",partition="columns", columns = ["id"]},
+  {matcher = ['mytestdb.mytable_detail'],topic = "{schema}_{table}",partition="columns", columns = ["id"]},
+  {matcher = ['mytestdb.mytable_detail_info'],topic = "{schema}_{table}",partition="columns", columns = ["id"]},
+  {matcher = ['mytestdb.tenant'],topic = "{schema}_{table}",partition="columns", columns = ["id"]}
+]
+protocol = "canal-json"
