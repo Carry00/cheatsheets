@@ -1,29 +1,107 @@
-# To display list of all available commands:
-kubectl -h
 
-# To display an explanation of a specific command:
-kubectl command_name -h
+# Kubectl 常用命令
 
-# To display complete list of supported resources:
-kubectl api-resources
+## 基本命令
 
-# To display an explanation of a specific resource:
-kubectl explain resource_name
+# 显示集群信息
+kubectl cluster-info
 
-# To display an explanation of a specific field of resource:
-kubectl explain resource_name.field_name
+# 列出所有命名空间
+kubectl get namespaces
 
-# To display list of global command-line options:
-kubectl options
+# 列出所有节点
+kubectl get nodes
 
-# To set up `kubectl` autocomplete in bash (press Tab to use):
-source <(kubectl completion bash)
+# 列出所有pods
+kubectl get pods
 
-# To display all resources in all namespaces:
-kubectl get all -A
+# 列出指定命名空间中的所有pods
+kubectl get pods -n <namespace>
 
-# To order events by `creationTimestamp`:
-kubectl get events --sort-by='.metadata.creationTimestamp'
+# 查看pod的详细信息
+kubectl describe pod <pod-name> -n <namespace>
 
-# To switch context of a specific cluster:
-kubectl config use-context CONTEXT_NAME [options]
+# 列出所有服务
+kubectl get services
+
+# 列出所有部署
+kubectl get deployments
+
+# 列出所有副本集（ReplicaSet）
+kubectl get rs
+
+# 列出所有守护进程集（DaemonSet）
+kubectl get ds
+
+# 列出所有状态ful集（StatefulSet）
+kubectl get sts
+
+# 列出所有作业（Job）
+kubectl get jobs
+
+# 列出所有定时任务（CronJob）
+kubectl get cronjobs
+
+## 管理资源
+
+# 创建资源
+kubectl apply -f <file.yaml>
+
+# 删除资源
+kubectl delete -f <file.yaml>
+
+# 删除指定pod
+kubectl delete pod <pod-name> -n <namespace>
+
+# 更新资源
+kubectl apply -f <file.yaml>
+
+# 通过运行一个命令在pod中创建临时容器
+kubectl run <pod-name> --image=<image> -- <command>
+
+## 调试和日志
+
+# 查看pod的日志
+kubectl logs <pod-name> -n <namespace>
+
+# 如果pod有多个容器，可以指定容器名查看日志
+kubectl logs <pod-name> -c <container-name> -n <namespace>
+
+# 进入pod的shell
+kubectl exec -it <pod-name> -n <namespace> -- /bin/bash
+
+# 查看所有事件
+kubectl get events -n <namespace>
+
+# 列出集群中的所有资源及其使用的配额
+kubectl get resourcequotas -n <namespace>
+
+## 端口转发
+
+# 将本地端口转发到pod端口
+kubectl port-forward <pod-name> <local-port>:<pod-port> -n <namespace>
+
+## 配置和查看配置
+
+# 列出当前上下文
+kubectl config get-contexts
+
+# 切换上下文
+kubectl config use-context <context-name>
+
+# 查看当前上下文的详细信息
+kubectl config view
+
+## 常见组合命令
+
+# 列出所有pods并显示它们的标签
+kubectl get pods --show-labels
+
+# 根据标签选择器列出pods
+kubectl get pods -l <label-selector> -n <namespace>
+
+# 创建资源并等待其准备就绪
+kubectl apply -f <file.yaml> && kubectl rollout status <resource>/<name>
+
+# 列出所有没有运行的pods
+kubectl get pods --field-selector=status.phase!=Running -n <namespace>
